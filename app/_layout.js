@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useColorScheme } from "react-native";
 import "react-native-reanimated";
 import { ThemeProvider as CustomThemeProvider } from "../context/ThemeContext";
 
@@ -13,7 +14,7 @@ export default function RootLayout() {
   return (
     <CustomThemeProvider>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
           options={{ presentation: "modal", title: "Modal" }}
