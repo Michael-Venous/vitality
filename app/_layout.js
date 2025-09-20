@@ -13,6 +13,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="tabs" options={{ headerShown: false }} />
+          <Stack.Screen name="exercise" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="auto" />
       </CustomThemeProvider>

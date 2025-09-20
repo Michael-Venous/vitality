@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { Button, StyleSheet, Text, View } from "react-native";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function ResultsScreen() {
   const theme = useTheme();
@@ -13,13 +13,8 @@ export default function ResultsScreen() {
       <Text style={[styles.tagline, { color: theme.colors.text }]}>
         results
       </Text>
-      <Text style={[styles.quote, { color: theme.colors.text }]}>
-        "lul"
-      </Text>
-      <Button
-        title="Get Started"
-        color={theme.colors.primary}
-      />
+      <Text style={[styles.quote, { color: theme.colors.text }]}>"lul"</Text>
+      <Button title="Get Started" color={theme.colors.primary} />
     </View>
   );
 }
