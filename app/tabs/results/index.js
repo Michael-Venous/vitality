@@ -14,7 +14,13 @@ export default function ResultsScreen() {
         results
       </Text>
       <Text style={[styles.quote, { color: theme.colors.text }]}>"lul"</Text>
-      <Button title="Get Started" color={theme.colors.primary} />
+      <Button
+        title="Go to result"
+        color={theme.colors.primary}
+        onPress={() => {
+          router.push("/tabs/results/singleResult");
+        }}
+      />
     </View>
   );
 }

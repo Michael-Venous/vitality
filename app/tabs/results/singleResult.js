@@ -14,7 +14,13 @@ export default function ResultsScreen() {
         This exercise result
       </Text>
       <Text style={[styles.quote, { color: theme.colors.text }]}>"lul"</Text>
-      <Button title="Done" color={theme.colors.primary} />
+      <Button
+        title="Done"
+        color={theme.colors.primary}
+        onPress={() => {
+          router.back();
+        }}
+      />
     </View>
   );
 }

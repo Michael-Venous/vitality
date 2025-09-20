@@ -22,7 +22,7 @@ export default function HomeScreen() {
             styles.separatorLine,
             { backgroundColor: theme.colors.border },
           ]}
-        />{" "}
+        />
         {/* left line*/}
         <Text style={[styles.separatorText, { color: theme.colors.text }]}>
           Exercises
@@ -32,7 +32,7 @@ export default function HomeScreen() {
             styles.separatorLine,
             { backgroundColor: theme.colors.border },
           ]}
-        />{" "}
+        />
         {/* right line*/}
       </View>
       <View style={styles.contentContainer}>
