@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
 
 export default function WelcomeScreen() {
@@ -7,11 +8,11 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   const navigateToLogin = () => {
-    router.replace("/tabs/home");
+    router.replace("/tabs");
   };
 
   return (
-    <View
+    <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <Text style={[styles.tagline, { color: theme.colors.text }]}>
@@ -25,7 +26,7 @@ export default function WelcomeScreen() {
         color={theme.colors.primary}
         onPress={navigateToLogin}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
