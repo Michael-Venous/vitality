@@ -1,13 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import {
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import GradientBackground from "../../../components/GradientBackground";
 import { useTheme } from "../../../context/ThemeContext";
 
@@ -15,7 +9,10 @@ export default function ProfileScreen() {
   const theme = useTheme();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      edges={["top", "left", "right"]}
+    >
       <GradientBackground>
         <View style={styles.header}>
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>

@@ -54,6 +54,7 @@ export default function ReviewResultScreen() {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
+      edges={["top", "left", "right"]}
     >
       <Text style={[styles.title, { color: theme.colors.text }]}>
         Workout Complete!

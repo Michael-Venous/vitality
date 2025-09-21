@@ -11,8 +11,6 @@ export default function ExerciseLayout() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="exerciseSelect" />
-
         <Stack.Screen name="exercisePlay" />
       </Stack>
     </>

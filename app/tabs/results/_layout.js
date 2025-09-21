@@ -12,7 +12,7 @@ export default function ResultsLayout() {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="singleResult" />
+        <Stack.Screen name="reviewResult" />
       </Stack>
     </>
   );

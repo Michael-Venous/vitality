@@ -97,7 +97,10 @@ export default function ResultsScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      edges={["top", "left", "right"]}
+    >
       <GradientBackground>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.headerRow}>
