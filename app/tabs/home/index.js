@@ -6,6 +6,7 @@ import { useTheme } from "../../../context/ThemeContext";
 
 import EnduranceCard from "../../../components/dashboardComponents/enduranceCard";
 import PersonalBestsCard from "../../../components/dashboardComponents/personalBestsCard";
+import Header from "../../../components/headerComponent";
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -14,6 +15,14 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.headerRow}>
+          <Header />
+          <View style={styles.headerTextContainer}>
+            <Text style={[styles.title, { color: theme.colors.text }]}>Goals</Text>
+            <Text style={[styles.subtitle, { color: theme.colors.secondaryText }]}>Keep up the hard work!</Text>
+          </View>
+        </View>
+
         <View style={styles.iconContainer}>
           <View style={styles.streakGoalContainer}>
             <View style={styles.fireIconWrapper}>
@@ -50,7 +59,6 @@ export default function HomeScreen() {
 
         <EnduranceCard />
         <PersonalBestsCard />
-        
       </ScrollView>
     </SafeAreaView>
   );
@@ -58,8 +66,26 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   scrollContent: {
+    paddingVertical: 20,
     alignItems: "center",
-    paddingBottom: 20,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "90%",
+    marginBottom: 20,
+  },
+  headerTextContainer: {
+    marginLeft: 10,
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+  },
+  subtitle: {
+    fontSize: 16,
+    marginTop: 5,
   },
   tagline: {
     fontSize: 24,
@@ -85,7 +111,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     justifyContent: "center",
-    marginTop: 80,
+    marginTop: 30,
     backgroundColor: "#143048ff",
     height: 225,
     width: "90%",
