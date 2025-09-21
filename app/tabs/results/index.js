@@ -1,37 +1,23 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../../components/headerComponent";
-import CompletedWorkouts from "../../../components/resultsComponents/completedWorkouts";
 import { useTheme } from "../../../context/ThemeContext";
 import { EXERCISES } from "../../../data/exerciseData";
 
 const exerciseDetailsMap = new Map(EXERCISES.map((ex) => [ex.id, ex]));
 
-const completedWorkoutsLog = [
-  { id: "1", text: "Pushups: 50 reps in 1:37", imageKey: "pushup" },
-  { id: "2", text: "Squats: 70 reps in 2:02", imageKey: "squat" },
-  { id: "3", text: "Situps: 50 reps in 0:58", imageKey: "situp" },
-];
-
-const completedWorkoutsData = completedWorkoutsLog.map((workout) => {
-  const details = exerciseDetailsMap.get(workout.imageKey);
-  return {
-    ...workout,
-    imageSource: details ? details.image : null,
-  };
-});
-
-// temp data
-const weeklySummaryData = {
-  progress: 75,
-  workoutsCompleted: 5,
-  totalWorkouts: 6,
-  caloriesBurned: 3200,
-};
-
-// component for weekly summary stats
 const SummaryIconCard = ({ icon, text, subtext, theme, iconColor }) => (
   <View style={styles.summaryIconCard}>
     <Ionicons name={icon} size={24} color={iconColor} />
@@ -54,11 +40,42 @@ const SummaryIconCard = ({ icon, text, subtext, theme, iconColor }) => (
 export default function ResultsScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const [completedWorkouts, setCompletedWorkouts] = useState([]);
+
+  const loadWorkouts = async () => {
+    try {
+      const workoutsJson = await AsyncStorage.getItem("completedWorkouts");
+      if (workoutsJson !== null) {
+        const workouts = JSON.parse(workoutsJson).map((workout) => {
+          const details = exerciseDetailsMap.get(workout.exerciseId);
+          return {
+            ...workout,
+            imageSource: details ? details.image : null,
+            title: details ? details.title : "Workout",
+          };
+        });
+        setCompletedWorkouts(workouts);
+      }
+    } catch (e) {
+      console.error("Failed to load workouts.", e);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadWorkouts();
+    }, [])
+  );
+
+  const weeklySummaryData = {
+    progress: 75,
+    workoutsCompleted: completedWorkouts.length,
+    totalWorkouts: 6,
+    caloriesBurned: 3200,
+  };
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerRow}>
           <Header />
@@ -125,9 +142,38 @@ export default function ResultsScreen() {
         </View>
 
         <View style={styles.cardContainer}>
-          <CompletedWorkouts workouts={completedWorkoutsData} />
+          <Text style={[styles.sectionHeader, { color: theme.colors.text }]}>
+            Completed Workouts
+          </Text>
+          {completedWorkouts.map((workout) => (
+            <TouchableOpacity
+              key={workout.id}
+              style={styles.workoutCard}
+              onPress={() =>
+                router.push(
+                  `/tabs/results/reviewResult?reps=${workout.reps}&time=${workout.time}&exerciseId=${workout.exerciseId}&isReviewing=true`
+                )
+              }
+            >
+              <Image source={workout.imageSource} style={styles.workoutImage} />
+              <View style={styles.workoutTextContainer}>
+                <Text style={styles.workoutTitle}>{workout.title}</Text>
+                <Text style={styles.workoutSubtitle}>
+                  {workout.reps} reps in{" "}
+                  {`${Math.floor(workout.time / 60)
+                    .toString()
+                    .padStart(2, "0")}:${(workout.time % 60)
+                    .toString()
+                    .padStart(2, "0")}`}
+                </Text>
+              </View>
+              <View style={styles.scoreContainer}>
+                <Text style={styles.scoreValue}>{workout.score}</Text>
+                <Text style={styles.scoreLabel}>Score</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -164,6 +210,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "white",
   },
   weeklySummaryCard: {
     backgroundColor: "#1A2A3A",
@@ -193,9 +240,11 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 28,
     fontWeight: "bold",
+    color: "white",
   },
   progressSubtitle: {
     fontSize: 16,
+    color: "grey",
   },
   summaryStats: {
     flexDirection: "row",
@@ -211,8 +260,50 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 5,
     textAlign: "center",
+    color: "white",
   },
   summaryIconSubtext: {
     fontSize: 12,
+    color: "grey",
+  },
+  workoutCard: {
+    backgroundColor: "#1A2A3A",
+    borderRadius: 15,
+    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  workoutImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+  },
+  workoutTextContainer: {
+    flex: 1,
+  },
+  workoutTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+  },
+  workoutSubtitle: {
+    fontSize: 14,
+    color: "grey",
+    marginTop: 4,
+  },
+  scoreContainer: {
+    alignItems: "center",
+    marginLeft: 15,
+  },
+  scoreValue: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#52d874",
+  },
+  scoreLabel: {
+    fontSize: 12,
+    color: "grey",
   },
 });

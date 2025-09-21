@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -222,6 +223,9 @@ export default function PoseDetectionCamera() {
         frameProcessor={frameProcessor}
         frameProcessorFps={12}
       />
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={32} color="white" />
+      </TouchableOpacity>
       {!isReady && (
         <View style={styles.countdownContainer}>
           <Text style={styles.countdownText}>{countdown}</Text>
@@ -300,7 +304,11 @@ export default function PoseDetectionCamera() {
       </View>
       <View style={styles.bottomContainer}>
         <Text style={styles.repText}>Reps: {repCount}</Text>
-        <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
+        <TouchableOpacity
+          style={[styles.doneButton, repCount === 0 && styles.disabledButton]}
+          onPress={handleDone}
+          disabled={repCount === 0}
+        >
           <Text style={styles.doneButtonText}>Done</Text>
         </TouchableOpacity>
       </View>
@@ -357,6 +365,13 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 20,
   },
+  backButton: {
+    position: "absolute",
+    top: 60,
+    left: 20,
+    zIndex: 10,
+    padding: 10,
+  },
   doneButton: {
     backgroundColor: "#52d874",
     paddingVertical: 15,
@@ -367,6 +382,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  disabledButton: {
+    backgroundColor: "#a1a1a1", // Gray out the button when disabled
+    opacity: 0.7,
   },
   doneButtonText: {
     color: "white",
