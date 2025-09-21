@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import {
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -17,7 +17,11 @@ const goalCategories = [
   { key: "calories", label: "Calories Burned Goal", unit: "kcal" },
 ];
 
-export default function AddGoalModal({ modalVisible, setModalVisible, onGoalAdded }) {
+export default function AddGoalModal({
+  modalVisible,
+  setModalVisible,
+  onGoalAdded,
+}) {
   const theme = useTheme();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [goalValue, setGoalValue] = useState("");
