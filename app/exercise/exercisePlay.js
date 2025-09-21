@@ -12,11 +12,11 @@ import {
 } from "react-native-vision-camera";
 import { useResizePlugin } from "vision-camera-resize-plugin";
 import { useTheme } from "../../context/ThemeContext";
-import { useSquatCounter } from "../../hooks/useSquatCounter";
+import { useSitupCounter } from "../../hooks/useSitupCounter";
 
 const MODEL_INPUT_WIDTH = 192;
 const MODEL_INPUT_HEIGHT = 192;
-const CONFIDENCE_THRESHOLD = 0.1;
+const CONFIDENCE_THRESHOLD = 0.3;
 const TARGET_FPS = 24;
 
 // Keypoint Names and Skeleton Connections
@@ -74,7 +74,7 @@ export default function PoseDetectionCamera() {
   const { resize } = useResizePlugin();
 
   const [keypoints, setKeypoints] = useState([]);
-  const pushupCount = useSquatCounter(keypoints);
+  const pushupCount = useSitupCounter(keypoints);
   const [cameraViewDimensions, setCameraViewDimensions] = useState({
     width: 0,
     height: 0,
@@ -139,6 +139,11 @@ export default function PoseDetectionCamera() {
     return <Text>Requesting camera permission...</Text>;
   }
 
+  const { width: viewWidth, height: viewHeight } = cameraViewDimensions;
+  const boxSize = Math.min(viewWidth, viewHeight);
+  const offsetX = (viewWidth - boxSize) / 2;
+  const offsetY = (viewHeight - boxSize) / 2;
+
   return (
     <View
       style={styles.container}
@@ -155,65 +160,70 @@ export default function PoseDetectionCamera() {
         frameProcessor={frameProcessor}
         frameProcessorFps={12}
       />
+
+      {viewWidth > 0 && viewHeight > 0 && (
+        <>
+          <View
+            style={[
+              styles.overlay,
+              { top: 0, left: 0, height: offsetY, width: "100%" },
+            ]}
+          />
+          <View
+            style={[
+              styles.overlay,
+              { bottom: 0, left: 0, height: offsetY, width: "100%" },
+            ]}
+          />
+          <View
+            style={[
+              styles.overlay,
+              { top: 0, left: 0, height: "100%", width: offsetX },
+            ]}
+          />
+          <View
+            style={[
+              styles.overlay,
+              { top: 0, right: 0, height: "100%", width: offsetX },
+            ]}
+          />
+        </>
+      )}
+
       <Svg style={StyleSheet.absoluteFill}>
-        {(() => {
-          if (
-            cameraViewDimensions.width === 0 ||
-            cameraViewDimensions.height === 0
-          ) {
-            return null;
-          }
-
-          const { width: viewWidth, height: viewHeight } = cameraViewDimensions;
-          const boxSize = Math.min(viewWidth, viewHeight);
-          const offsetX = (viewWidth - boxSize) / 2;
-          const offsetY = (viewHeight - boxSize) / 2;
-
-          return (
-            <>
-              {SKELETON_CONNECTIONS.map(([startName, endName], index) => {
-                const start = findKeypoint(startName);
-                const end = findKeypoint(endName);
-                if (start && end) {
-                  const startX = (1 - start.y) * boxSize + offsetX;
-                  const startY = (1 - start.x) * boxSize + offsetY;
-                  const endX = (1 - end.y) * boxSize + offsetX;
-                  const endY = (1 - end.x) * boxSize + offsetY;
-
-                  return (
-                    <Line
-                      key={`line-${index}`}
-                      x1={startX}
-                      y1={startY}
-                      x2={endX}
-                      y2={endY}
-                      stroke={theme.colors.primary}
-                      strokeWidth="5"
-                    />
-                  );
-                }
-                return null;
-              })}
-
-              {keypoints.map((kp, index) => {
-                const cx = (1 - kp.y) * boxSize + offsetX;
-                const cy = (1 - kp.x) * boxSize + offsetY;
-
+        {viewWidth > 0 && (
+          <>
+            {SKELETON_CONNECTIONS.map(([startName, endName], index) => {
+              const start = findKeypoint(startName);
+              const end = findKeypoint(endName);
+              if (start && end) {
                 return (
-                  <Circle
-                    key={`circle-${index}`}
-                    cx={cx}
-                    cy={cy}
-                    r="8"
-                    fill={theme.colors.orange}
+                  <Line
+                    key={`line-${index}`}
+                    x1={(1 - start.y) * boxSize + offsetX}
+                    y1={(1 - start.x) * boxSize + offsetY}
+                    x2={(1 - end.y) * boxSize + offsetX}
+                    y2={(1 - end.x) * boxSize + offsetY}
+                    stroke={theme.colors.primary}
+                    strokeWidth="5"
                   />
                 );
-              })}
-            </>
-          );
-        })()}
-      </Svg>
+              }
+              return null;
+            })}
 
+            {keypoints.map((kp, index) => (
+              <Circle
+                key={`circle-${index}`}
+                cx={(1 - kp.y) * boxSize + offsetX}
+                cy={(1 - kp.x) * boxSize + offsetY}
+                r="8"
+                fill={theme.colors.orange}
+              />
+            ))}
+          </>
+        )}
+      </Svg>
       <View style={styles.buttonContainer}>
         <Button
           title="Done"
@@ -230,6 +240,11 @@ export default function PoseDetectionCamera() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center" },
+  overlay: {
+    position: "absolute",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 1,
+  },
   message: { textAlign: "center", paddingBottom: 10 },
   camera: { flex: 1 },
   buttonContainer: {

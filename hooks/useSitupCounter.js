@@ -14,23 +14,19 @@ function calculateAngle(a, b, c) {
   if (magnitudeBA === 0 || magnitudeBC === 0) return null;
 
   let cosine = dotProduct / (magnitudeBA * magnitudeBC);
-
   cosine = Math.max(-1, Math.min(1, cosine));
-
   const angle = Math.acos(cosine) * (180 / Math.PI);
 
   return angle;
 }
 
-const HIP_SQUAT_THRESHOLD = 120;
-const KNEE_SQUAT_THRESHOLD = 100;
+const SITUP_UP_THRESHOLD = 90;
+const SITUP_DOWN_THRESHOLD = 100;
 
-const HIP_STAND_THRESHOLD = 160;
-const KNEE_STAND_THRESHOLD = 160;
-
-export function useSquatCounter(keypoints) {
+export function useSitupCounter(keypoints) {
   const [count, setCount] = useState(0);
-  const phase = useRef("up");
+  const phase = useRef("down");
+  const isLyingDown = useRef(false);
 
   useEffect(() => {
     if (!keypoints || keypoints.length === 0) return;
@@ -38,38 +34,36 @@ export function useSquatCounter(keypoints) {
     const leftShoulder = keypoints.find((kp) => kp.name === "left_shoulder");
     const leftHip = keypoints.find((kp) => kp.name === "left_hip");
     const leftKnee = keypoints.find((kp) => kp.name === "left_knee");
-    const leftAnkle = keypoints.find((kp) => kp.name === "left_ankle");
 
     const rightShoulder = keypoints.find((kp) => kp.name === "right_shoulder");
     const rightHip = keypoints.find((kp) => kp.name === "right_hip");
     const rightKnee = keypoints.find((kp) => kp.name === "right_knee");
-    const rightAnkle = keypoints.find((kp) => kp.name === "right_ankle");
 
-    const leftHipAngle = calculateAngle(leftShoulder, leftHip, leftKnee);
-    const rightHipAngle = calculateAngle(rightShoulder, rightHip, rightKnee);
-    const leftKneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
-    const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle);
+    const leftAngle = calculateAngle(leftShoulder, leftHip, leftKnee);
+    const rightAngle = calculateAngle(rightShoulder, rightHip, rightKnee);
 
-    const hipAngle = Math.min(leftHipAngle || 180, rightHipAngle || 180);
-    const kneeAngle = Math.min(leftKneeAngle || 180, rightKneeAngle || 180);
+    // check for lie down position
+    const avgHipY = (leftHip?.y + rightHip?.y) / 2;
+    const avgKneeY = (leftKnee?.y + rightKnee?.y) / 2;
+    const isOnTheGround = avgHipY && avgKneeY ? avgKneeY > avgHipY : false;
+    if (!isOnTheGround) return;
+    // waits until user first lies down
+    if (!isLyingDown.current) {
+      if (isOnTheGround) {
+        isLyingDown.current = true;
+      }
+      return;
+    }
 
-    const isDown =
-      hipAngle &&
-      kneeAngle &&
-      hipAngle < HIP_SQUAT_THRESHOLD &&
-      kneeAngle < KNEE_SQUAT_THRESHOLD;
+    const angle = Math.min(leftAngle || 180, rightAngle || 180);
+    if (angle === 180) return; // returns if no angle detected
 
-    const isUp =
-      hipAngle &&
-      kneeAngle &&
-      hipAngle > HIP_STAND_THRESHOLD &&
-      kneeAngle > KNEE_STAND_THRESHOLD;
-
-    if (phase.current === "up" && isDown) {
-      phase.current = "down";
-    } else if (phase.current === "down" && isUp) {
-      setCount((prevCount) => prevCount + 1);
+    if (phase.current === "down" && angle < SITUP_UP_THRESHOLD) {
       phase.current = "up";
+    } else if (phase.current === "up" && angle > SITUP_DOWN_THRESHOLD) {
+      setCount((c) => c + 1);
+      console.log("situp" + count);
+      phase.current = "down";
     }
   }, [keypoints]);
 
