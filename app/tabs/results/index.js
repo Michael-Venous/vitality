@@ -74,7 +74,6 @@ export default function ResultsScreen() {
           </View>
         </View>
 
-        {/* Weekly Summary Card */}
         <View style={styles.cardContainer}>
           <Text style={[styles.sectionHeader, { color: theme.colors.text }]}>
             Weekly Summary
@@ -125,7 +124,9 @@ export default function ResultsScreen() {
           </View>
         </View>
 
-        <CompletedWorkouts workouts={completedWorkoutsData} />
+        <View style={styles.cardContainer}>
+          <CompletedWorkouts workouts={completedWorkoutsData} />
+        </View>
 
       </ScrollView>
     </SafeAreaView>
