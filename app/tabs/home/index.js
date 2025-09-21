@@ -1,61 +1,65 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../context/ThemeContext";
+
+import EnduranceCard from "../../../components/dashboardComponents/enduranceCard";
+import PersonalBestsCard from "../../../components/dashboardComponents/personalBestsCard";
 
 export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
-      <View style={styles.iconContainer}>
-        <AntDesign name="fire" size={120} color="orange" />
-        <Text style={styles.streakNumber}>3</Text>
-      </View>
-      <View style={styles.separatorContainer}>
-        <View
-          style={[
-            styles.separatorLine,
-            { backgroundColor: theme.colors.border },
-          ]}
-        />
-        {/* left line*/}
-        <Text style={[styles.separatorText, { color: theme.colors.text }]}>
-          Exercises
-        </Text>
-        <View
-          style={[
-            styles.separatorLine,
-            { backgroundColor: theme.colors.border },
-          ]}
-        />
-        {/* right line*/}
-      </View>
-      <View style={styles.contentContainer}>
-        <Text style={[styles.tagline, { color: theme.colors.text }]}>
-          buttfart
-        </Text>
-        <Text style={[styles.quote, { color: theme.colors.text }]}>"lul"</Text>
-        <Button
-          title="Get Started"
-          color={theme.colors.primary}
-          onPress={() => {
-            router.push("/exercise/exerciseSelect");
-          }}
-        />
-      </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.iconContainer}>
+          <View style={styles.streakGoalContainer}>
+            <View style={styles.fireIconWrapper}>
+              <AntDesign name="fire" size={120} color="orange" />
+              <Text style={styles.streakNumber}>3</Text>
+            </View>
+            <View style={styles.textColumn}>
+              <Text style={styles.streakText}>
+                Streak goal
+                <Text style={styles.streakTextBold}> 43% </Text>
+                complete. Complete 4 more days to meet your goal!
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.separatorContainer}>
+          <View
+            style={[
+              styles.separatorLine,
+              { backgroundColor: theme.colors.border },
+            ]}
+          />
+          <Text style={[styles.separatorText, { color: theme.colors.text }]}>
+            Goals
+          </Text>
+          <View
+            style={[
+              styles.separatorLine,
+              { backgroundColor: theme.colors.border },
+            ]}
+          />
+        </View>
+
+        <EnduranceCard />
+        <PersonalBestsCard />
+        
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContent: {
     alignItems: "center",
+    paddingBottom: 20,
   },
   tagline: {
     fontSize: 24,
@@ -65,12 +69,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
   },
-  contentContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
   separatorContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -85,17 +83,45 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     fontWeight: "bold",
   },
-
   iconContainer: {
     justifyContent: "center",
-    alignItems: "center",
     marginTop: 80,
+    backgroundColor: "#143048ff",
+    height: 225,
+    width: "90%",
+    borderRadius: 20,
+    paddingHorizontal: 20,
+  },
+  streakGoalContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  fireIconWrapper: {
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  textColumn: {
+    marginLeft: 20,
+    flexShrink: 1,
   },
   streakNumber: {
     position: "absolute",
     fontSize: 50,
     fontWeight: "bold",
     color: "white",
-    top: 45,
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: -15 }, { translateY: -25 }],
+  },
+  streakText: {
+    fontSize: 20,
+    color: "white",
+  },
+  streakTextBold: {
+    fontSize: 20,
+    color: "green",
+    fontWeight: "bold",
   },
 });
