@@ -1,14 +1,15 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GradientBackground from "../../../components/GradientBackground";
 import Header from "../../../components/headerComponent";
 import { useTheme } from "../../../context/ThemeContext";
 import { EXERCISES } from "../../../data/exerciseData";
@@ -19,53 +20,55 @@ export default function ExercisesScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.headerRow}>
-          <Header />
-          <View style={styles.headerTextContainer}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>
-              Exercises
-            </Text>
-            <Text
-              style={[styles.subtitle, { color: theme.colors.secondaryText }]}
-            >
-              Choose an exercise to begin!
-            </Text>
+      <GradientBackground>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.headerRow}>
+            <Header />
+            <View style={styles.headerTextContainer}>
+              <Text style={[styles.title, { color: theme.colors.text }]}>
+                Exercises
+              </Text>
+              <Text
+                style={[styles.subtitle, { color: theme.colors.secondaryText }]}
+              >
+                Choose an exercise to begin!
+              </Text>
+            </View>
           </View>
-        </View>
 
-        {/* exercise list */}
-        <View style={styles.listContainer}>
-          {EXERCISES.map((exercise) => (
-            <TouchableOpacity
-              key={exercise.id}
-              style={[
-                styles.exerciseCard,
-                { backgroundColor: theme.colors.card },
-              ]}
-              onPress={() => router.push(`/tabs/exercises/${exercise.id}`)}
-            >
-              <Image source={exercise.image} style={styles.exerciseImage} />
-              <View style={styles.textContainer}>
-                <Text
-                  style={[styles.exerciseTitle, { color: theme.colors.text }]}
-                >
-                  {exercise.title}
-                </Text>
-                <Text
-                  style={[
-                    styles.exerciseDescription,
-                    { color: theme.colors.secondaryText },
-                  ]}
-                  numberOfLines={2}
-                >
-                  {exercise.description}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+          {/* exercise list */}
+          <View style={styles.listContainer}>
+            {EXERCISES.map((exercise) => (
+              <TouchableOpacity
+                key={exercise.id}
+                style={[
+                  styles.exerciseCard,
+                  { backgroundColor: theme.colors.card },
+                ]}
+                onPress={() => router.push(`/tabs/exercises/${exercise.id}`)}
+              >
+                <Image source={exercise.image} style={styles.exerciseImage} />
+                <View style={styles.textContainer}>
+                  <Text
+                    style={[styles.exerciseTitle, { color: theme.colors.text }]}
+                  >
+                    {exercise.title}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.exerciseDescription,
+                      { color: theme.colors.secondaryText },
+                    ]}
+                    numberOfLines={2}
+                  >
+                    {exercise.description}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </GradientBackground>
     </SafeAreaView>
   );
 }
