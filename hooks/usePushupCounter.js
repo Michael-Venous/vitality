@@ -40,12 +40,12 @@ export function usePushupCounter(keypoints) {
     const rightHip = keypoints.find((kp) => kp.name === "right_hip");
 
     // check for plank position
-    const shoulderY = (leftShoulder?.y + rightShoulder?.y) / 2;
-    const hipY = (leftHip?.y + rightHip?.y) / 2;
-
+    const shoulderY = leftShoulder?.y || rightShoulder?.y;
+    const hipY = leftHip?.y || rightHip?.y;
     if (!shoulderY || !hipY) return;
 
-    const isPlankPosition = Math.abs(shoulderY - hipY) > 0.1;
+    const isPlankPosition = Math.abs(shoulderY - hipY) > 0.05;
+    console.log("isPlankPosition", isPlankPosition);
 
     // check elbow angles
     const leftAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
@@ -54,15 +54,13 @@ export function usePushupCounter(keypoints) {
 
     if (angle === 180) return;
 
-    if (phase.current === "up" && angle < 110 && isPlankPosition) {
+    if (phase.current === "up" && angle < 90 && isPlankPosition) {
       phase.current = "down";
     } else if (phase.current === "down" && angle > 150) {
       const leftWristAboveElbow = leftWrist?.x >= leftElbow?.x;
       const rightWristAboveElbow = rightWrist?.x >= rightElbow?.x;
-      console.log("gud");
-      // only activates if wrists are detected and above elbows to avoid false positives
-      if (!leftWristAboveElbow || !rightWristAboveElbow) {
-        console.log("gud.,kl;kl;okl");
+      // only passes if wrists are detected and above elbows to avoid false positives
+      if (!leftWristAboveElbow && !rightWristAboveElbow) {
         setCount((c) => c + 1);
         phase.current = "up";
       }

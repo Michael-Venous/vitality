@@ -1,14 +1,14 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../../components/headerComponent";
 import { useTheme } from "../../../context/ThemeContext";
 import { EXERCISES } from "../../../data/exerciseData";
@@ -18,9 +18,7 @@ export default function ExercisesScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerRow}>
           <Header />
@@ -47,16 +45,10 @@ export default function ExercisesScreen() {
               ]}
               onPress={() => router.push(`/tabs/exercises/${exercise.id}`)}
             >
-              <Image
-                source={exercise.image}
-                style={styles.exerciseImage}
-              />
+              <Image source={exercise.image} style={styles.exerciseImage} />
               <View style={styles.textContainer}>
                 <Text
-                  style={[
-                    styles.exerciseTitle,
-                    { color: theme.colors.text },
-                  ]}
+                  style={[styles.exerciseTitle, { color: theme.colors.text }]}
                 >
                   {exercise.title}
                 </Text>

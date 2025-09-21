@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTensorflowModel } from "react-native-fast-tflite";
 import Svg, { Circle, Line } from "react-native-svg";
 import {
@@ -12,7 +12,10 @@ import {
 } from "react-native-vision-camera";
 import { useResizePlugin } from "vision-camera-resize-plugin";
 import { useTheme } from "../../context/ThemeContext";
+import { EXERCISES } from "../../data/exerciseData";
+import { usePushupCounter } from "../../hooks/usePushupCounter";
 import { useSitupCounter } from "../../hooks/useSitupCounter";
+import { useSquatCounter } from "../../hooks/useSquatCounter";
 
 const MODEL_INPUT_WIDTH = 192;
 const MODEL_INPUT_HEIGHT = 192;
@@ -60,9 +63,16 @@ const SKELETON_CONNECTIONS = [
   ["right_knee", "right_ankle"],
 ];
 
+const COUNTER_MAP = {
+  situp: useSitupCounter,
+  pushup: usePushupCounter,
+  squat: useSquatCounter,
+};
+
 export default function PoseDetectionCamera() {
   const router = useRouter();
   const theme = useTheme();
+  const { exerciseId } = useLocalSearchParams();
   const [facing, setFacing] = useState("front");
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice(facing);
@@ -74,11 +84,33 @@ export default function PoseDetectionCamera() {
   const { resize } = useResizePlugin();
 
   const [keypoints, setKeypoints] = useState([]);
-  const pushupCount = useSitupCounter(keypoints);
   const [cameraViewDimensions, setCameraViewDimensions] = useState({
     width: 0,
     height: 0,
   });
+
+  // Timer logic
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setElapsedTime((prevTime) => prevTime + 1);
+    }, 1000);
+
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  const handleDone = () => {
+    clearInterval(timerRef.current);
+    router.replace(
+      `/exercise/reviewResult?reps=${repCount}&time=${elapsedTime}&exerciseId=${exerciseId}`
+    );
+  };
+
+  // select the correct counter
+  const CounterHook = COUNTER_MAP[exerciseId];
+  const repCount = CounterHook(keypoints);
 
   const onKeypointsDetected = useCallback((newKeypoints) => {
     setKeypoints(newKeypoints);
@@ -143,6 +175,8 @@ export default function PoseDetectionCamera() {
   const boxSize = Math.min(viewWidth, viewHeight);
   const offsetX = (viewWidth - boxSize) / 2;
   const offsetY = (viewHeight - boxSize) / 2;
+
+  const exercise = EXERCISES.find((ex) => ex.id === exerciseId);
 
   return (
     <View
@@ -224,15 +258,19 @@ export default function PoseDetectionCamera() {
           </>
         )}
       </Svg>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Done"
-          color={theme.primary}
-          onPress={() => {
-            router.push("/tabs/results");
-          }}
-        />
-        <Text style={styles.text}>Pushups: {pushupCount}</Text>
+      <View style={styles.topContainer}>
+        <Text style={styles.exerciseName}>{exercise?.title || "Workout"}</Text>
+        <Text style={styles.timerText}>{`${Math.floor(elapsedTime / 60)
+          .toString()
+          .padStart(2, "0")}:${(elapsedTime % 60)
+          .toString()
+          .padStart(2, "0")}`}</Text>
+      </View>
+      <View style={styles.bottomContainer}>
+        <Text style={styles.repText}>Reps: {repCount}</Text>
+        <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
+          <Text style={styles.doneButtonText}>Done</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -245,16 +283,50 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     zIndex: 1,
   },
-  message: { textAlign: "center", paddingBottom: 10 },
-  camera: { flex: 1 },
-  buttonContainer: {
+  topContainer: {
     position: "absolute",
-    bottom: 64,
-    flexDirection: "row",
-    backgroundColor: "transparent",
+    top: 60,
     width: "100%",
-    paddingHorizontal: 64,
+    alignItems: "center",
+    zIndex: 2,
   },
-  button: { flex: 1, alignItems: "center" },
-  text: { fontSize: 24, fontWeight: "bold", color: "white" },
+  bottomContainer: {
+    position: "absolute",
+    bottom: 60,
+    width: "100%",
+    alignItems: "center",
+    zIndex: 2,
+  },
+  exerciseName: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "white",
+  },
+  timerText: {
+    fontSize: 24,
+    color: "white",
+    marginTop: 5,
+  },
+  repText: {
+    fontSize: 64,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 20,
+  },
+  doneButton: {
+    backgroundColor: "#52d874",
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  doneButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
 });

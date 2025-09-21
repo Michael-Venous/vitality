@@ -1,14 +1,14 @@
-import { Link, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../context/ThemeContext";
 import { EXERCISES } from "../../../data/exerciseData";
 
@@ -23,15 +23,13 @@ export default function ExerciseDetailScreen() {
     return (
       <SafeAreaView>
         <Text>Exercise not found!</Text>
-        <Link href="/tabs/exercises">Go Back</Link>
+        <Button title="Go Back" onPress={() => router.back()} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={[styles.title, { color: theme.colors.text }]}>
           {exercise.title}
@@ -41,7 +39,9 @@ export default function ExerciseDetailScreen() {
 
         <TouchableOpacity
           style={[styles.playButton, { backgroundColor: theme.colors.primary }]}
-          onPress={() => router.push(`../../exercise/exercisePlay`)} //change this so it routes (put in this folder) to dynamic page once finished with exercisePlay
+          onPress={() =>
+            router.push(`/exercise/exercisePlay?exerciseId=${exercise.id}`)
+          }
         >
           <Text style={styles.playButtonText}>Play</Text>
         </TouchableOpacity>

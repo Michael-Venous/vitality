@@ -20,8 +20,8 @@ function calculateAngle(a, b, c) {
   return angle;
 }
 
-const SITUP_UP_THRESHOLD = 90;
-const SITUP_DOWN_THRESHOLD = 100;
+const SITUP_UP_THRESHOLD = 80;
+const SITUP_DOWN_THRESHOLD = 140;
 
 export function useSitupCounter(keypoints) {
   const [count, setCount] = useState(0);
@@ -55,14 +55,33 @@ export function useSitupCounter(keypoints) {
       return;
     }
 
+    // make sure back is on ground
+    const shoulderY = leftShoulder?.y || rightShoulder?.y;
+    const hipY = leftHip?.y || rightHip?.y;
+    if (!shoulderY || !hipY) return;
+
+    const isBackPosition = Math.abs(shoulderY - hipY) > 0.05;
+    console.log("isBackPosition", isBackPosition);
+
     const angle = Math.min(leftAngle || 180, rightAngle || 180);
     if (angle === 180) return; // returns if no angle detected
 
-    if (phase.current === "down" && angle < SITUP_UP_THRESHOLD) {
+    if (
+      phase.current === "down" &&
+      angle < SITUP_UP_THRESHOLD &&
+      isOnTheGround
+    ) {
       phase.current = "up";
-    } else if (phase.current === "up" && angle > SITUP_DOWN_THRESHOLD) {
+    } else if (
+      phase.current === "up" &&
+      angle > SITUP_DOWN_THRESHOLD &&
+      isBackPosition
+    ) {
       setCount((c) => c + 1);
       console.log("situp" + count);
+      phase.current = "down";
+    } else if (phase.current === "up" && !isBackPosition) {
+      // resets to down if user is not in back position to avoid false positives
       phase.current = "down";
     }
   }, [keypoints]);

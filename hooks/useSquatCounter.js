@@ -22,8 +22,8 @@ function calculateAngle(a, b, c) {
   return angle;
 }
 
-const HIP_SQUAT_THRESHOLD = 120;
-const KNEE_SQUAT_THRESHOLD = 100;
+const HIP_SQUAT_THRESHOLD = 90;
+const KNEE_SQUAT_THRESHOLD = 90;
 
 const HIP_STAND_THRESHOLD = 160;
 const KNEE_STAND_THRESHOLD = 160;
@@ -49,6 +49,13 @@ export function useSquatCounter(keypoints) {
     const rightHipAngle = calculateAngle(rightShoulder, rightHip, rightKnee);
     const leftKneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
     const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle);
+
+    // check if angles exist
+    if (
+      (leftHipAngle === null && rightHipAngle === null) ||
+      (leftKneeAngle === null && rightKneeAngle === null)
+    )
+      return;
 
     const hipAngle = Math.min(leftHipAngle || 180, rightHipAngle || 180);
     const kneeAngle = Math.min(leftKneeAngle || 180, rightKneeAngle || 180);
