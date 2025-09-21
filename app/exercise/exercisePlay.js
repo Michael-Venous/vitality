@@ -12,11 +12,11 @@ import {
 } from "react-native-vision-camera";
 import { useResizePlugin } from "vision-camera-resize-plugin";
 import { useTheme } from "../../context/ThemeContext";
-import { useElbowCounter } from "../../hooks/usePushupCounter";
+import { useSquatCounter } from "../../hooks/useSquatCounter";
 
 const MODEL_INPUT_WIDTH = 192;
 const MODEL_INPUT_HEIGHT = 192;
-const CONFIDENCE_THRESHOLD = 0.3;
+const CONFIDENCE_THRESHOLD = 0.1;
 const TARGET_FPS = 24;
 
 // Keypoint Names and Skeleton Connections
@@ -74,8 +74,7 @@ export default function PoseDetectionCamera() {
   const { resize } = useResizePlugin();
 
   const [keypoints, setKeypoints] = useState([]);
-  const leftElbowReps = useElbowCounter(keypoints, "left");
-  const rightElbowReps = useElbowCounter(keypoints, "right");
+  const pushupCount = useSquatCounter(keypoints);
   const [cameraViewDimensions, setCameraViewDimensions] = useState({
     width: 0,
     height: 0,
@@ -154,7 +153,7 @@ export default function PoseDetectionCamera() {
         device={device}
         isActive={true}
         frameProcessor={frameProcessor}
-        frameProcessorFps={TARGET_FPS}
+        frameProcessorFps={12}
       />
       <Svg style={StyleSheet.absoluteFill}>
         {(() => {
@@ -223,8 +222,7 @@ export default function PoseDetectionCamera() {
             router.push("/tabs/results");
           }}
         />
-        <Text style={styles.text}>Left Arm Reps: {leftElbowReps}</Text>
-        <Text style={styles.text}>Right Arm Reps: {rightElbowReps}</Text>
+        <Text style={styles.text}>Pushups: {pushupCount}</Text>
       </View>
     </View>
   );
