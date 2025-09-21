@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../../components/headerComponent";
 import CompletedWorkouts from "../../../components/resultsComponents/completedWorkouts";
 import { useTheme } from "../../../context/ThemeContext";
-import { EXERCISES } from "../../../data/exercises";
+import { EXERCISES } from "../../../data/exerciseData";
 
 const exerciseDetailsMap = new Map(EXERCISES.map((ex) => [ex.id, ex]));
 
