@@ -1,4 +1,4 @@
-// app/exercise/reviewResult.js
+// app/tabs/results/reviewResult.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
@@ -10,12 +10,15 @@ import { EXERCISES } from "../../../data/exerciseData";
 export default function ReviewResultScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { reps, time, exerciseId } = useLocalSearchParams();
+  const { reps, time, exerciseId, isReviewing } = useLocalSearchParams();
 
   const exercise = EXERCISES.find((ex) => ex.id === exerciseId);
   const formattedTime = `${Math.floor(time / 60)
     .toString()
     .padStart(2, "0")}:${(time % 60).toString().padStart(2, "0")}`;
+
+  // Calculate score
+  const score = time > 0 ? Math.round((reps * reps) / time) : 0;
 
   const saveWorkout = async () => {
     try {
@@ -28,6 +31,7 @@ export default function ReviewResultScreen() {
         reps: parseInt(reps),
         time: parseInt(time),
         exerciseId: exerciseId,
+        score: score, // Save the score
       };
       const existingWorkouts = JSON.parse(
         (await AsyncStorage.getItem("completedWorkouts")) || "[]"
@@ -41,6 +45,10 @@ export default function ReviewResultScreen() {
     } catch (e) {
       console.error("Failed to save workout.", e);
     }
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   return (
@@ -71,13 +79,29 @@ export default function ReviewResultScreen() {
             Time
           </Text>
         </View>
+        <View style={styles.statBox}>
+          <Text style={[styles.statValue, { color: theme.colors.primary }]}>
+            {score}
+          </Text>
+          <Text style={[styles.statLabel, { color: theme.colors.text }]}>
+            Score
+          </Text>
+        </View>
       </View>
 
-      <Button
-        title="Save and Finish"
-        color={theme.colors.primary}
-        onPress={saveWorkout}
-      />
+      {isReviewing ? (
+        <Button
+          title="Back to Results"
+          color={theme.colors.primary}
+          onPress={handleBack}
+        />
+      ) : (
+        <Button
+          title="Save and Finish"
+          color={theme.colors.primary}
+          onPress={saveWorkout}
+        />
+      )}
     </SafeAreaView>
   );
 }
