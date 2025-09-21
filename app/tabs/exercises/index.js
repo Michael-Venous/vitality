@@ -1,12 +1,12 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../../components/headerComponent";
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "90%",
     marginBottom: 20,
-    marginTop: 52,
+    marginTop: 20,
   },
   headerTextContainer: {
     marginLeft: 10,

@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "90%",
     marginBottom: 20,
-    paddingTop: 19.5, //if you make it 20 it moves a tiny bit
+    paddingTop: 20, //play with this if additions mess with header (changes of like 0.5)
   },
   headerTextContainer: {
     marginLeft: 10,
