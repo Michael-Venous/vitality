@@ -121,7 +121,7 @@ export default function ResultsScreen() {
             <Text style={[styles.sectionHeader, { color: theme.colors.text }]}>
               Weekly Summary
             </Text>
-            <View style={styles.weeklySummaryCard}>
+            <View style={[styles.weeklySummaryCard, { backgroundColor: theme.colors.card }]}>
               <View style={styles.progressBarContainer}>
                 <View
                   style={[
@@ -243,7 +243,6 @@ const styles = StyleSheet.create({
     color: "white",
   },
   weeklySummaryCard: {
-    backgroundColor: "#1A2A3A",
     borderRadius: 15,
     padding: 20,
     flexDirection: "row",
