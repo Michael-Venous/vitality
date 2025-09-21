@@ -8,7 +8,6 @@ export default function ExercisesLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="[exerciseId]" />
-      <Stack.Screen name="exercisePlay" />
     </Stack>
   );
 }
