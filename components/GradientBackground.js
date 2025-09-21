@@ -7,7 +7,7 @@ const GradientBackground = ({ children }) => {
 
   return (
     <LinearGradient
-      colors={[theme.colors.background, "#000000ff"]}
+      colors={[theme.colors.background, theme.colors.secondary]}
       style={{ flex: 1 }}
     >
       {children}

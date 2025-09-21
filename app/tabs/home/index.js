@@ -189,7 +189,12 @@ export default function HomeScreen() {
           </View>
 
           {/* streak card */}
-          <View style={styles.iconContainer}>
+          <View
+            style={[
+              { backgroundColor: theme.colors.card },
+              styles.iconContainer,
+            ]}
+          >
             <View style={styles.streakGoalContainer}>
               <View style={styles.fireIconWrapper}>
                 <AntDesign name="fire" size={120} color="orange" />
@@ -293,7 +298,6 @@ const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: "center",
     marginTop: 30,
-    backgroundColor: "#143048ff",
     height: 225,
     width: "90%",
     borderRadius: 20,
