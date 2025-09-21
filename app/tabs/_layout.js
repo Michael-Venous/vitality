@@ -28,7 +28,7 @@ export default function TabsLayout() {
             ),
           }}
         />
-        
+
         <Tabs.Screen
           name="exercises"
           options={{
@@ -45,6 +45,15 @@ export default function TabsLayout() {
             title: "Results",
             tabBarIcon: ({ color }) => (
               <Ionicons name="trophy" size={24} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="person-outline" size={24} color={color} />
             ),
           }}
         />

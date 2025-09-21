@@ -3,13 +3,21 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AddGoalModal from "../../../components/dashboardComponents/addGoalModal";
 import EnduranceCard from "../../../components/dashboardComponents/enduranceCard";
 import EnduranceProgressModal from "../../../components/dashboardComponents/enduranceProgressModal";
 import GoalCard from "../../../components/dashboardComponents/goalCard";
 import PersonalBestsCard from "../../../components/dashboardComponents/personalBestsCard";
+import GradientBackground from "../../../components/GradientBackground";
 import Header from "../../../components/headerComponent";
 import { useTheme } from "../../../context/ThemeContext";
 
@@ -17,25 +25,60 @@ export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
   const [addGoalModalVisible, setAddGoalModalVisible] = useState(false);
-  const [EnduranceProgressModalVisible, setEnduranceProgressModalVisible] = useState(false);
+  const [enduranceProgressModalVisible, setEnduranceProgressModalVisible] =
+    useState(false);
   const [allGoals, setAllGoals] = useState([]);
   const [selectedGoal, setSelectedGoal] = useState(null);
+  const [streak, setStreak] = useState(0);
 
   const enduranceGoal = allGoals.find((goal) => goal.category === "endurance");
 
-  const loadGoals = async () => {
+  const loadData = async () => {
     try {
       const goalsJson = await AsyncStorage.getItem("userGoals");
       const savedGoals = goalsJson ? JSON.parse(goalsJson) : [];
       setAllGoals(savedGoals);
+
+      const workoutsJson = await AsyncStorage.getItem("completedWorkouts");
+      if (workoutsJson !== null) {
+        const workouts = JSON.parse(workoutsJson);
+        calculateStreak(workouts);
+      }
     } catch (e) {
-      console.error("Failed to load goals.", e);
+      console.error("Failed to load data.", e);
     }
+  };
+
+  const calculateStreak = (workouts) => {
+    if (workouts.length === 0) {
+      setStreak(0);
+      return;
+    }
+    const sortedWorkouts = workouts.sort(
+      (a, b) => new Date(b.id) - new Date(a.id)
+    );
+    let currentStreak = 1;
+    let lastDate = new Date(sortedWorkouts[0].id);
+    lastDate.setHours(0, 0, 0, 0);
+
+    for (let i = 1; i < sortedWorkouts.length; i++) {
+      let currentDate = new Date(sortedWorkouts[i].id);
+      currentDate.setHours(0, 0, 0, 0);
+      let diff =
+        (lastDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24);
+      if (diff === 1) {
+        currentStreak++;
+        lastDate = currentDate;
+      } else if (diff > 1) {
+        break;
+      }
+    }
+    setStreak(currentStreak);
   };
 
   useFocusEffect(
     useCallback(() => {
-      loadGoals();
+      loadData();
     }, [])
   );
 
@@ -45,6 +88,7 @@ export default function HomeScreen() {
       setEnduranceProgressModalVisible(true);
     } else {
       Alert.alert(
+        "No Endurance Goal Set",
         "Please add an endurance goal first using the 'Add Goal' button."
       );
     }
@@ -60,7 +104,7 @@ export default function HomeScreen() {
       ) {
         return {
           ...g,
-          progress: (g.progress || 0) + newProgress,
+          progress: (g.progress || 0) + parseFloat(newProgress),
         };
       }
       return g;
@@ -72,7 +116,6 @@ export default function HomeScreen() {
     } catch (e) {
       console.error("Failed to save progress", e);
     }
-    setSelectedGoal(null);
   };
 
   const handleDeleteGoal = (goalIndex) => {
@@ -112,98 +155,96 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-    >
-      <AddGoalModal
-        modalVisible={addGoalModalVisible}
-        setModalVisible={setAddGoalModalVisible}
-        onGoalAdded={loadGoals}
-      />
-      <EnduranceProgressModal
-        modalVisible={EnduranceProgressModalVisible}
-        setModalVisible={setEnduranceProgressModalVisible}
-        goal={selectedGoal}
-        onSave={handleSaveProgress}
-      />
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <GradientBackground>
+        <AddGoalModal
+          modalVisible={addGoalModalVisible}
+          setModalVisible={setAddGoalModalVisible}
+          onGoalAdded={loadData}
+        />
+        <EnduranceProgressModal
+          modalVisible={enduranceProgressModalVisible}
+          setModalVisible={setEnduranceProgressModalVisible}
+          goal={selectedGoal}
+          onSave={handleSaveProgress}
+        />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* header */}
-        <View style={styles.headerRow}>
-          <Header />
-          <View style={styles.headerTextContainer}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>
-              Home
-            </Text>
-            <Text
-              style={[styles.subtitle, { color: theme.colors.secondaryText }]}
-            >
-              Your headquarters for your health
-            </Text>
-          </View>
-        </View>
-
-        {/* streak card */}
-        <View style={styles.iconContainer}>
-          <View style={styles.streakGoalContainer}>
-            <View style={styles.fireIconWrapper}>
-              <AntDesign name="fire" size={120} color="orange" />
-              <Text style={styles.streakNumber}>3</Text>
-            </View>
-            <View style={styles.textColumn}>
-              <Text style={styles.streakText}>
-                Streak goal
-                <Text style={styles.streakTextBold}> 43% </Text>
-                complete. Complete 4 more days to meet your goal!
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* header */}
+          <View style={styles.headerRow}>
+            <Header />
+            <View style={styles.headerTextContainer}>
+              <Text style={[styles.title, { color: theme.colors.text }]}>
+                Home
+              </Text>
+              <Text
+                style={[styles.subtitle, { color: theme.colors.secondaryText }]}
+              >
+                Your headquarters for your health
               </Text>
             </View>
           </View>
-        </View>
 
-        <EnduranceCard
-          goal={enduranceGoal}
-          onPress={handleEnduranceCardPress}
-        />
-        <PersonalBestsCard />
+          {/* streak card */}
+          <View style={styles.iconContainer}>
+            <View style={styles.streakGoalContainer}>
+              <View style={styles.fireIconWrapper}>
+                <AntDesign name="fire" size={120} color="orange" />
+                <Text style={styles.streakNumber}>{streak}</Text>
+              </View>
+              <View style={styles.textColumn}>
+                <Text style={styles.streakText}>
+                  You are on a {streak}-day streak. Keep it up!
+                </Text>
+              </View>
+            </View>
+          </View>
 
-        {/* separator */}
-        <View style={styles.separatorContainer}>
-          <View
-            style={[
-              styles.separatorLine,
-              { backgroundColor: theme.colors.border },
-            ]}
+          <EnduranceCard
+            goal={enduranceGoal}
+            onPress={handleEnduranceCardPress}
           />
-          <Text style={[styles.separatorText, { color: theme.colors.text }]}>
-            Goals
-          </Text>
-          <View
-            style={[
-              styles.separatorLine,
-              { backgroundColor: theme.colors.border },
-            ]}
-          />
-        </View>
+          <PersonalBestsCard />
 
-        {/* goals display */}
-        <View style={styles.goalsListContainer}>
-          {allGoals.map((goal, index) => (
-            <GoalCard
-              key={index}
-              goal={goal}
-              onLongPress={() => handleDeleteGoal(index)}
+          {/* separator */}
+          <View style={styles.separatorContainer}>
+            <View
+              style={[
+                styles.separatorLine,
+                { backgroundColor: theme.colors.border },
+              ]}
             />
-          ))}
-        </View>
+            <Text style={[styles.separatorText, { color: theme.colors.text }]}>
+              Goals
+            </Text>
+            <View
+              style={[
+                styles.separatorLine,
+                { backgroundColor: theme.colors.border },
+              ]}
+            />
+          </View>
 
-        {/* add goal button */}
-        <TouchableOpacity
-          style={styles.addGoalButton}
-          onPress={() => setAddGoalModalVisible(true)}
-        >
-          <Text style={styles.addGoalButtonText}>Add Goal</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          {/* goals display */}
+          <View style={styles.goalsListContainer}>
+            {allGoals.map((goal, index) => (
+              <GoalCard
+                key={index}
+                goal={goal}
+                onLongPress={() => handleDeleteGoal(index)}
+              />
+            ))}
+          </View>
+
+          {/* add goal button */}
+          <TouchableOpacity
+            style={styles.addGoalButton}
+            onPress={() => setAddGoalModalVisible(true)}
+          >
+            <Text style={styles.addGoalButtonText}>Add Goal</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </GradientBackground>
     </SafeAreaView>
   );
 }
@@ -275,18 +316,10 @@ const styles = StyleSheet.create({
     fontSize: 50,
     fontWeight: "bold",
     color: "white",
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: -15 }, { translateY: -25 }],
   },
   streakText: {
     fontSize: 20,
     color: "white",
-  },
-  streakTextBold: {
-    fontSize: 20,
-    color: "green",
-    fontWeight: "bold",
   },
   goalsListContainer: {
     width: "90%",
@@ -297,14 +330,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 25,
     marginTop: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   addGoalButtonText: {
     color: "white",

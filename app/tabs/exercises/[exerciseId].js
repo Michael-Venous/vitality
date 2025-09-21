@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
@@ -30,6 +31,9 @@ export default function ExerciseDetailScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+      </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={[styles.title, { color: theme.colors.text }]}>
           {exercise.title}
@@ -80,6 +84,12 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     alignItems: "center",
+  },
+  backButton: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    zIndex: 1,
   },
   title: {
     fontSize: 32,
