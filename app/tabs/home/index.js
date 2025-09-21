@@ -7,6 +7,7 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "re
 import { SafeAreaView } from "react-native-safe-area-context";
 import AddGoalModal from "../../../components/dashboardComponents/addGoalModal";
 import EnduranceCard from "../../../components/dashboardComponents/enduranceCard";
+import EnduranceProgressModal from "../../../components/dashboardComponents/enduranceProgressModal";
 import GoalCard from "../../../components/dashboardComponents/goalCard";
 import PersonalBestsCard from "../../../components/dashboardComponents/personalBestsCard";
 import Header from "../../../components/headerComponent";
@@ -15,17 +16,18 @@ import { useTheme } from "../../../context/ThemeContext";
 export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [goals, setGoals] = useState([]);
+  const [addGoalModalVisible, setAddGoalModalVisible] = useState(false);
+  const [EnduranceProgressModalVisible, setEnduranceProgressModalVisible] = useState(false);
+  const [allGoals, setAllGoals] = useState([]);
+  const [selectedGoal, setSelectedGoal] = useState(null);
+
+  const enduranceGoal = allGoals.find((goal) => goal.category === "endurance");
 
   const loadGoals = async () => {
     try {
       const goalsJson = await AsyncStorage.getItem("userGoals");
-      if (goalsJson !== null) {
-        setGoals(JSON.parse(goalsJson));
-      } else {
-        setGoals([]);
-      }
+      const savedGoals = goalsJson ? JSON.parse(goalsJson) : [];
+      setAllGoals(savedGoals);
     } catch (e) {
       console.error("Failed to load goals.", e);
     }
@@ -37,15 +39,51 @@ export default function HomeScreen() {
     }, [])
   );
 
+  const handleEnduranceCardPress = () => {
+    if (enduranceGoal) {
+      setSelectedGoal(enduranceGoal);
+      setEnduranceProgressModalVisible(true);
+    } else {
+      Alert.alert(
+        "Please add an endurance goal first using the 'Add Goal' button."
+      );
+    }
+  };
+
+  const handleSaveProgress = async (newProgress) => {
+    if (!selectedGoal) return;
+
+    const updatedGoals = allGoals.map((g) => {
+      if (
+        g.category === selectedGoal.category &&
+        g.value === selectedGoal.value
+      ) {
+        return {
+          ...g,
+          progress: (g.progress || 0) + newProgress,
+        };
+      }
+      return g;
+    });
+
+    try {
+      await AsyncStorage.setItem("userGoals", JSON.stringify(updatedGoals));
+      setAllGoals(updatedGoals);
+    } catch (e) {
+      console.error("Failed to save progress", e);
+    }
+    setSelectedGoal(null);
+  };
+
   const handleDeleteGoal = (goalIndex) => {
-    const goalToDelete = goals[goalIndex];
+    const goalToDelete = allGoals[goalIndex];
     const goalType =
       goalToDelete.category.charAt(0).toUpperCase() +
       goalToDelete.category.slice(1);
 
     Alert.alert(
       "Delete Goal",
-      `Are you sure you want to delete your ${goalType} goal?`, //change this if you want
+      `Are you sure you want to delete your ${goalType} goal?`,
       [
         {
           text: "Cancel",
@@ -56,10 +94,10 @@ export default function HomeScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              const updatedGoals = goals.filter(
+              const updatedGoals = allGoals.filter(
                 (_, index) => index !== goalIndex
               );
-              setGoals(updatedGoals);
+              setAllGoals(updatedGoals);
               await AsyncStorage.setItem(
                 "userGoals",
                 JSON.stringify(updatedGoals)
@@ -78,9 +116,15 @@ export default function HomeScreen() {
       style={{ flex: 1, backgroundColor: theme.colors.background }}
     >
       <AddGoalModal
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
+        modalVisible={addGoalModalVisible}
+        setModalVisible={setAddGoalModalVisible}
         onGoalAdded={loadGoals}
+      />
+      <EnduranceProgressModal
+        modalVisible={EnduranceProgressModalVisible}
+        setModalVisible={setEnduranceProgressModalVisible}
+        goal={selectedGoal}
+        onSave={handleSaveProgress}
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -116,8 +160,10 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* endurance and PB components */}
-        <EnduranceCard />
+        <EnduranceCard
+          goal={enduranceGoal}
+          onPress={handleEnduranceCardPress}
+        />
         <PersonalBestsCard />
 
         {/* separator */}
@@ -141,7 +187,7 @@ export default function HomeScreen() {
 
         {/* goals display */}
         <View style={styles.goalsListContainer}>
-          {goals.map((goal, index) => (
+          {allGoals.map((goal, index) => (
             <GoalCard
               key={index}
               goal={goal}
@@ -153,7 +199,7 @@ export default function HomeScreen() {
         {/* add goal button */}
         <TouchableOpacity
           style={styles.addGoalButton}
-          onPress={() => setModalVisible(true)}
+          onPress={() => setAddGoalModalVisible(true)}
         >
           <Text style={styles.addGoalButtonText}>Add Goal</Text>
         </TouchableOpacity>
