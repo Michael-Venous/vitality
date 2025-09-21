@@ -89,28 +89,56 @@ export default function PoseDetectionCamera() {
     height: 0,
   });
 
-  // Timer logic
+  // timer logic
+  const [countdown, setCountdown] = useState(3);
+  const [isReady, setIsReady] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const timerRef = useRef(null);
 
   useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setElapsedTime((prevTime) => prevTime + 1);
+    // 3-2-1
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => prev - 1);
     }, 1000);
 
-    return () => clearInterval(timerRef.current);
-  }, []);
+    const startTimerTimeout = setTimeout(() => {
+      clearInterval(countdownInterval);
+      setIsReady(true);
+      timerRef.current = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
+    }, 3000);
+
+    return () => {
+      clearInterval(countdownInterval);
+      clearTimeout(startTimerTimeout);
+      clearInterval(timerRef.current);
+    };
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleDone = () => {
     clearInterval(timerRef.current);
     router.replace(
-      `/exercise/reviewResult?reps=${repCount}&time=${elapsedTime}&exerciseId=${exerciseId}`
+      `/tabs/results/reviewResult?reps=${repCount}&time=${elapsedTime}&exerciseId=${exerciseId}`
     );
   };
 
-  // select the correct counter
-  const CounterHook = COUNTER_MAP[exerciseId];
-  const repCount = CounterHook(keypoints);
+  const situpCount = useSitupCounter(keypoints);
+  const pushupCount = usePushupCounter(keypoints);
+  const squatCount = useSquatCounter(keypoints);
+
+  const repCount = useMemo(() => {
+    switch (exerciseId) {
+      case "situp":
+        return situpCount;
+      case "pushup":
+        return pushupCount;
+      case "squat":
+        return squatCount;
+      default:
+        return 0;
+    }
+  }, [exerciseId, situpCount, pushupCount, squatCount]);
 
   const onKeypointsDetected = useCallback((newKeypoints) => {
     setKeypoints(newKeypoints);
@@ -194,7 +222,11 @@ export default function PoseDetectionCamera() {
         frameProcessor={frameProcessor}
         frameProcessorFps={12}
       />
-
+      {!isReady && (
+        <View style={styles.countdownContainer}>
+          <Text style={styles.countdownText}>{countdown}</Text>
+        </View>
+      )}
       {viewWidth > 0 && viewHeight > 0 && (
         <>
           <View
@@ -282,6 +314,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     zIndex: 1,
+  },
+  countdownContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.7)",
+    zIndex: 10,
+  },
+  countdownText: {
+    fontSize: 128,
+    fontWeight: "bold",
+    color: "white",
   },
   topContainer: {
     position: "absolute",
