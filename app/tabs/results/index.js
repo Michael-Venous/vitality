@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import CircularProgress from "react-native-circular-progress-indicator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GradientBackground from "../../../components/GradientBackground";
 import Header from "../../../components/headerComponent";
@@ -21,20 +22,22 @@ const exerciseDetailsMap = new Map(EXERCISES.map((ex) => [ex.id, ex]));
 
 const SummaryIconCard = ({ icon, text, subtext, theme, iconColor }) => (
   <View style={styles.summaryIconCard}>
-    <Ionicons name={icon} size={24} color={iconColor} />
-    <Text style={[styles.summaryIconText, { color: theme.colors.text }]}>
-      {text}
-    </Text>
-    {subtext && (
-      <Text
-        style={[
-          styles.summaryIconSubtext,
-          { color: theme.colors.secondaryText },
-        ]}
-      >
-        {subtext}
+    <Ionicons name={icon} size={28} color={iconColor} />
+    <View style={styles.summaryIconTextContainer}>
+      <Text style={[styles.summaryIconText, { color: theme.colors.text }]}>
+        {text}
       </Text>
-    )}
+      {subtext && (
+        <Text
+          style={[
+            styles.summaryIconSubtext,
+            { color: theme.colors.secondaryText },
+          ]}
+        >
+          {subtext}
+        </Text>
+      )}
+    </View>
   </View>
 );
 
@@ -45,7 +48,7 @@ export default function ResultsScreen() {
   const [weeklySummaryData, setWeeklySummaryData] = useState({
     progress: 0,
     workoutsCompleted: 0,
-    totalWorkouts: 6, // This can be a goal from AsyncStorage
+    totalWorkouts: 6,
     caloriesBurned: 0,
   });
 
@@ -63,6 +66,9 @@ export default function ResultsScreen() {
         });
         setCompletedWorkouts(workouts);
         calculateWeeklySummary(workouts);
+      } else {
+        setCompletedWorkouts([]);
+        calculateWeeklySummary([]);
       }
     } catch (e) {
       console.error("Failed to load workouts.", e);
@@ -75,9 +81,11 @@ export default function ResultsScreen() {
     const weeklyWorkouts = workouts.filter((w) => new Date(w.id) >= oneWeekAgo);
     const workoutsCompleted = weeklyWorkouts.length;
     const totalWorkoutsGoal = 7;
-    const progress = Math.round((workoutsCompleted / totalWorkoutsGoal) * 100);
+    const progress =
+      totalWorkoutsGoal > 0
+        ? Math.round((workoutsCompleted / totalWorkoutsGoal) * 100)
+        : 0;
     const caloriesBurned = weeklyWorkouts.reduce((acc, workout) => {
-      // Very basic calorie calculation, can be improved
       const caloriesPerRep = 1.5;
       return acc + workout.reps * caloriesPerRep;
     }, 0);
@@ -127,47 +135,40 @@ export default function ResultsScreen() {
                 { backgroundColor: theme.colors.card },
               ]}
             >
-              <View style={styles.progressBarContainer}>
-                <View
-                  style={[
-                    styles.progressBarFill,
-                    {
-                      height: `${weeklySummaryData.progress}%`,
-                      backgroundColor: theme.colors.primary,
-                    },
-                  ]}
+              <View style={styles.progressCircleContainer}>
+                <CircularProgress
+                  value={weeklySummaryData.progress}
+                  radius={85}
+                  duration={1000}
+                  progressValueColor={theme.colors.text}
+                  activeStrokeColor={theme.colors.primary}
+                  inActiveStrokeColor={theme.colors.border}
+                  inActiveStrokeOpacity={0.5}
+                  inActiveStrokeWidth={18}
+                  activeStrokeWidth={18}
+                  valueSuffix={"%"}
+                  titleStyle={{
+                    fontWeight: "bold",
+                    color: theme.colors.text,
+                    fontSize: 18,
+                  }}
                 />
               </View>
-              <View style={styles.summaryContent}>
-                <View>
-                  <Text
-                    style={[styles.progressText, { color: theme.colors.text }]}
-                  >{`${weeklySummaryData.progress}%`}</Text>
-                  <Text
-                    style={[
-                      styles.progressSubtitle,
-                      { color: theme.colors.secondaryText },
-                    ]}
-                  >
-                    Complete
-                  </Text>
-                </View>
-                <View style={styles.summaryStats}>
-                  <SummaryIconCard
-                    icon="barbell-outline"
-                    text={`${weeklySummaryData.workoutsCompleted}/${weeklySummaryData.totalWorkouts}`}
-                    subtext="Workouts"
-                    theme={theme}
-                    iconColor="#e10c0cff"
-                  />
-                  <SummaryIconCard
-                    icon="flash-outline"
-                    text={`${weeklySummaryData.caloriesBurned} kcal`}
-                    subtext="Calories Burned"
-                    theme={theme}
-                    iconColor="#FFD700"
-                  />
-                </View>
+              <View style={styles.summaryStats}>
+                <SummaryIconCard
+                  icon="barbell"
+                  text={`${weeklySummaryData.workoutsCompleted}/${weeklySummaryData.totalWorkouts}`}
+                  subtext="Workouts"
+                  theme={theme}
+                  iconColor="#e10c0cff"
+                />
+                <SummaryIconCard
+                  icon="flash"
+                  text={`${weeklySummaryData.caloriesBurned} kcal`}
+                  subtext="Calories"
+                  theme={theme}
+                  iconColor="#FFD700"
+                />
               </View>
             </View>
           </View>
@@ -176,40 +177,63 @@ export default function ResultsScreen() {
             <Text style={[styles.sectionHeader, { color: theme.colors.text }]}>
               Completed Workouts
             </Text>
-            {completedWorkouts.map((workout) => (
-              <TouchableOpacity
-                key={workout.id}
+            {completedWorkouts.length > 0 ? (
+              completedWorkouts.map((workout) => (
+                <TouchableOpacity
+                  key={workout.id}
+                  style={[
+                    styles.workoutCard,
+                    { backgroundColor: theme.colors.card },
+                  ]}
+                  onPress={() =>
+                    router.push(
+                      `/tabs/results/reviewResult?reps=${workout.reps}&time=${workout.time}&exerciseId=${workout.exerciseId}&isReviewing=true`
+                    )
+                  }
+                >
+                  <Image
+                    source={workout.imageSource}
+                    style={styles.workoutImage}
+                  />
+                  <View style={styles.workoutTextContainer}>
+                    <Text style={styles.workoutTitle}>{workout.title}</Text>
+                    <Text style={styles.workoutSubtitle}>
+                      {workout.reps} reps in{" "}
+                      {`${Math.floor(workout.time / 60)
+                        .toString()
+                        .padStart(2, "0")}:${(workout.time % 60)
+                        .toString()
+                        .padStart(2, "0")}`}
+                    </Text>
+                  </View>
+                  <View style={styles.scoreContainer}>
+                    <Text style={styles.scoreValue}>{workout.score}</Text>
+                    <Text style={styles.scoreLabel}>Score</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View
                 style={[
-                  styles.workoutCard,
+                  styles.emptyStateContainer,
                   { backgroundColor: theme.colors.card },
                 ]}
-                onPress={() =>
-                  router.push(
-                    `/tabs/results/reviewResult?reps=${workout.reps}&time=${workout.time}&exerciseId=${workout.exerciseId}&isReviewing=true`
-                  )
-                }
               >
-                <Image
-                  source={workout.imageSource}
-                  style={styles.workoutImage}
-                />
-                <View style={styles.workoutTextContainer}>
-                  <Text style={styles.workoutTitle}>{workout.title}</Text>
-                  <Text style={styles.workoutSubtitle}>
-                    {workout.reps} reps in{" "}
-                    {`${Math.floor(workout.time / 60)
-                      .toString()
-                      .padStart(2, "0")}:${(workout.time % 60)
-                      .toString()
-                      .padStart(2, "0")}`}
-                  </Text>
-                </View>
-                <View style={styles.scoreContainer}>
-                  <Text style={styles.scoreValue}>{workout.score}</Text>
-                  <Text style={styles.scoreLabel}>Score</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+                <Text
+                  style={[styles.emptyStateText, { color: theme.colors.text }]}
+                >
+                  No workouts completed yet.
+                </Text>
+                <Text
+                  style={[
+                    styles.emptyStateSubtext,
+                    { color: theme.colors.secondaryText },
+                  ]}
+                >
+                  Go to the Exercises tab to get started!
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </GradientBackground>
@@ -248,63 +272,37 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
-    color: "white",
   },
   weeklySummaryCard: {
-    borderRadius: 15,
-    padding: 20,
+    borderRadius: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
     flexDirection: "row",
     alignItems: "center",
-    height: 160,
   },
-  progressBarContainer: {
-    width: 25,
-    height: 120,
-    backgroundColor: "#3a3a3a",
-    borderRadius: 12,
-    marginRight: 20,
-    overflow: "hidden",
-    justifyContent: "flex-end",
-  },
-  progressBarFill: {
-    width: "100%",
-  },
-  summaryContent: {
-    flex: 1,
-    justifyContent: "space-between",
-    height: 120,
-  },
-  progressText: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "white",
-  },
-  progressSubtitle: {
-    fontSize: 16,
-    color: "grey",
-  },
+  progressCircleContainer: {},
   summaryStats: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    marginLeft: 25,
   },
   summaryIconCard: {
-    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    paddingVertical: 10,
+  },
+  summaryIconTextContainer: {
+    marginLeft: 12,
   },
   summaryIconText: {
     fontSize: 18,
     fontWeight: "bold",
-    marginTop: 5,
-    textAlign: "center",
-    color: "white",
   },
   summaryIconSubtext: {
-    fontSize: 12,
-    color: "grey",
+    fontSize: 14,
   },
   workoutCard: {
-    backgroundColor: "#1A2A3A",
     borderRadius: 15,
     padding: 15,
     flexDirection: "row",
@@ -342,5 +340,20 @@ const styles = StyleSheet.create({
   scoreLabel: {
     fontSize: 12,
     color: "grey",
+  },
+  emptyStateContainer: {
+    borderRadius: 15,
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 100,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    marginTop: 5,
   },
 });
