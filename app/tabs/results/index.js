@@ -179,7 +179,10 @@ export default function ResultsScreen() {
             {completedWorkouts.map((workout) => (
               <TouchableOpacity
                 key={workout.id}
-                style={styles.workoutCard}
+                style={[
+                  styles.workoutCard,
+                  { backgroundColor: theme.colors.card },
+                ]}
                 onPress={() =>
                   router.push(
                     `/tabs/results/reviewResult?reps=${workout.reps}&time=${workout.time}&exerciseId=${workout.exerciseId}&isReviewing=true`
