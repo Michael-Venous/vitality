@@ -20,6 +20,7 @@ import PersonalBestsCard from "../../../components/dashboardComponents/personalB
 import GradientBackground from "../../../components/GradientBackground";
 import Header from "../../../components/headerComponent";
 import { useTheme } from "../../../context/ThemeContext";
+import { EXERCISES } from "../../../data/exerciseData";
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -30,6 +31,7 @@ export default function HomeScreen() {
   const [allGoals, setAllGoals] = useState([]);
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [streak, setStreak] = useState(0);
+  const [personalBests, setPersonalBests] = useState([]);
 
   const enduranceGoal = allGoals.find((goal) => goal.category === "endurance");
 
@@ -43,6 +45,7 @@ export default function HomeScreen() {
       if (workoutsJson !== null) {
         const workouts = JSON.parse(workoutsJson);
         calculateStreak(workouts);
+        calculatePersonalBests(workouts);
       }
     } catch (e) {
       console.error("Failed to load data.", e);
@@ -74,6 +77,28 @@ export default function HomeScreen() {
       }
     }
     setStreak(currentStreak);
+  };
+
+  const calculatePersonalBests = (workouts) => {
+    const bests = {};
+    workouts.forEach((workout) => {
+      if (
+        !bests[workout.exerciseId] ||
+        workout.reps > bests[workout.exerciseId].reps
+      ) {
+        bests[workout.exerciseId] = workout;
+      }
+    });
+    const bestsArray = Object.values(bests).map((workout) => {
+      const exerciseDetails = EXERCISES.find(
+        (ex) => ex.id === workout.exerciseId
+      );
+      return {
+        ...workout,
+        title: exerciseDetails ? exerciseDetails.title : "Unknown Workout",
+      };
+    });
+    setPersonalBests(bestsArray);
   };
 
   useFocusEffect(
@@ -212,7 +237,7 @@ export default function HomeScreen() {
             goal={enduranceGoal}
             onPress={handleEnduranceCardPress}
           />
-          <PersonalBestsCard />
+          <PersonalBestsCard personalBests={personalBests} />
 
           {/* separator */}
           <View style={styles.separatorContainer}>
@@ -267,7 +292,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "90%",
     marginBottom: 20,
-    paddingTop: 20, //play with this if additions mess with header (changes of like 0.5)
+    paddingTop: 20,
   },
   headerTextContainer: {
     marginLeft: 10,
@@ -298,7 +323,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: "center",
     marginTop: 30,
-    height: 225,
+    height: 150,
     width: "90%",
     borderRadius: 20,
     paddingHorizontal: 20,
