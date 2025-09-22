@@ -121,14 +121,19 @@ export default function ResultsScreen() {
             <Text style={[styles.sectionHeader, { color: theme.colors.text }]}>
               Weekly Summary
             </Text>
-            <View style={[styles.weeklySummaryCard, { backgroundColor: theme.colors.card }]}>
+            <View
+              style={[
+                styles.weeklySummaryCard,
+                { backgroundColor: theme.colors.card },
+              ]}
+            >
               <View style={styles.progressBarContainer}>
                 <View
                   style={[
                     styles.progressBarFill,
                     {
                       height: `${weeklySummaryData.progress}%`,
-                      backgroundColor: "#52d874",
+                      backgroundColor: theme.colors.primary,
                     },
                   ]}
                 />
