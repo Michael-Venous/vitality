@@ -14,10 +14,7 @@ export default function GoalCard({ goal, onLongPress }) {
 
   return (
     <TouchableOpacity
-      style={[
-        styles.card,
-        { backgroundColor: theme.colors.card },
-      ]}
+      style={[styles.card, { backgroundColor: theme.colors.card }]}
       onLongPress={onLongPress}
     >
       <View>
@@ -38,14 +35,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
   },
   title: {
     fontSize: 16,

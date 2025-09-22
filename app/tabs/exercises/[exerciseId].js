@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
+  Button,
   Image,
   ScrollView,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GradientBackground from "../../../components/GradientBackground"; // Import GradientBackground
 import { useTheme } from "../../../context/ThemeContext";
 import { EXERCISES } from "../../../data/exerciseData";
 
@@ -34,51 +36,69 @@ export default function ExerciseDetailScreen() {
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       edges={["top", "left", "right"]}
     >
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
-      </TouchableOpacity>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          {exercise.title}
-        </Text>
-
-        <Image source={exercise.gif} style={styles.gif} />
-
+      <GradientBackground>
         <TouchableOpacity
-          style={[styles.playButton, { backgroundColor: theme.colors.primary }]}
-          onPress={() =>
-            router.push(`/exercise/exercisePlay?exerciseId=${exercise.id}`)
-          }
+          style={styles.backButton}
+          onPress={() => router.back()}
         >
-          <Text style={styles.playButtonText}>Play</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-
-        <Text style={[styles.description, { color: theme.colors.text }]}>
-          {exercise.description}
-        </Text>
-
-        <View style={styles.infoBox}>
-          <Text style={[styles.infoTitle, { color: theme.colors.text }]}>
-            Muscle Groups
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={[styles.title, { color: theme.colors.text }]}>
+            {exercise.title}
           </Text>
-          <Text
-            style={[styles.infoContent, { color: theme.colors.secondaryText }]}
+
+          <Image source={exercise.gif} style={styles.gif} />
+
+          <TouchableOpacity
+            style={[
+              styles.playButton,
+              { backgroundColor: theme.colors.primary },
+            ]}
+            onPress={() =>
+              router.push(`/exercise/exercisePlay?exerciseId=${exercise.id}`)
+            }
           >
-            {exercise.muscleGroups.join(", ")}
-          </Text>
-        </View>
+            <Text style={styles.playButtonText}>Play</Text>
+          </TouchableOpacity>
 
-        <View style={styles.infoBox}>
-          <Text style={[styles.infoTitle, { color: theme.colors.text }]}>
-            Difficulty
+          <Text style={[styles.description, { color: theme.colors.text }]}>
+            {exercise.description}
           </Text>
-          <Text
-            style={[styles.infoContent, { color: theme.colors.secondaryText }]}
+
+          <View
+            style={[styles.infoBox, { backgroundColor: theme.colors.card }]}
           >
-            {exercise.difficulty}
-          </Text>
-        </View>
-      </ScrollView>
+            <Text style={[styles.infoTitle, { color: theme.colors.text }]}>
+              Muscle Groups
+            </Text>
+            <Text
+              style={[
+                styles.infoContent,
+                { color: theme.colors.secondaryText },
+              ]}
+            >
+              {exercise.muscleGroups.join(", ")}
+            </Text>
+          </View>
+
+          <View
+            style={[styles.infoBox, { backgroundColor: theme.colors.card }]}
+          >
+            <Text style={[styles.infoTitle, { color: theme.colors.text }]}>
+              Difficulty
+            </Text>
+            <Text
+              style={[
+                styles.infoContent,
+                { color: theme.colors.secondaryText },
+              ]}
+            >
+              {exercise.difficulty}
+            </Text>
+          </View>
+        </ScrollView>
+      </GradientBackground>
     </SafeAreaView>
   );
 }
@@ -87,10 +107,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     alignItems: "center",
+    paddingTop: 60, // Add padding to avoid content going under the back button
   },
   backButton: {
     position: "absolute",
-    top: 50,
+    top: 20,
     left: 20,
     zIndex: 1,
   },
@@ -123,7 +144,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   infoBox: {
-    backgroundColor: "#1c1c1e",
     borderRadius: 15,
     padding: 20,
     width: "100%",
