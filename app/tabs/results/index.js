@@ -74,7 +74,7 @@ export default function ResultsScreen() {
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     const weeklyWorkouts = workouts.filter((w) => new Date(w.id) >= oneWeekAgo);
     const workoutsCompleted = weeklyWorkouts.length;
-    const totalWorkoutsGoal = 6;
+    const totalWorkoutsGoal = 7;
     const progress = Math.round((workoutsCompleted / totalWorkoutsGoal) * 100);
     const caloriesBurned = weeklyWorkouts.reduce((acc, workout) => {
       // Very basic calorie calculation, can be improved
