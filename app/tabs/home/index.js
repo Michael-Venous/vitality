@@ -197,12 +197,12 @@ export default function HomeScreen() {
           >
             <View style={styles.streakGoalContainer}>
               <View style={styles.fireIconWrapper}>
-                <AntDesign name="fire" size={120} color="orange" />
+                <AntDesign name="fire" size={120} color={ theme.colors.primary } />
                 <Text style={styles.streakNumber}>{streak}</Text>
               </View>
               <View style={styles.textColumn}>
                 <Text style={styles.streakText}>
-                  You are on a {streak}-day streak. Keep it up!
+                  You are on a {streak}-day streak.
                 </Text>
               </View>
             </View>
@@ -323,6 +323,7 @@ const styles = StyleSheet.create({
     fontSize: 50,
     fontWeight: "bold",
     color: "white",
+    transform: [{ translateY: 12 }],
   },
   streakText: {
     fontSize: 20,
