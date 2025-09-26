@@ -1,50 +1,95 @@
-# Welcome to your Expo app 👋
+Vitality AI - Your Virtual Personal Trainer
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Build Your Vitality with AI Precision. Vitality AI is a mobile fitness application built with React Native that transforms your smartphone into an intelligent workout companion. It uses on-device machine learning to track your exercises, count your reps, and help you stay accountable to your fitness goals, all from the comfort of your home.
+The Problem
 
-## Get started
+At-home fitness routines often fail due to a lack of guidance, leading to improper form, potential injuries, and fading motivation. Without a personal trainer, users are left guessing if they're performing exercises correctly and find it tedious to track their progress manually.
+The Solution
 
-1. Install dependencies
+Vitality AI bridges this gap by providing an accessible, AI-powered solution that acts as a virtual personal trainer. By leveraging your phone's camera, it analyzes your movements in real-time, automates rep counting, and provides a centralized dashboard to track your goals, streaks, and personal bests.
+✨ Key Features
 
-   ```bash
-   npm install
-   ```
+    🤖 AI-Powered Exercise Tracking: Uses a TensorFlow Lite model (MoveNet) to perform real-time pose estimation, accurately counting reps for exercises like squats, pushups, and situps.
 
-2. Start the app
+    ✍️ Real-Time Skeleton Overlay: Visualizes the 17 keypoints of your body directly on the camera feed, providing a clear visual representation of the AI's tracking.
 
-   ```bash
-   npx expo start
-   ```
+    📊 Personalized Dashboard: A central home screen that displays your workout streak, personal bests for each exercise, and custom-set goals.
 
-In the output, you'll find options to open the app in a
+    🎯 Goal Setting & Tracking: Users can create, manage, and complete personal goals for workout streaks, endurance, calories, and personal bests.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+    📈 Automated Progress Logging: Every completed workout is automatically saved, calculating a performance score and updating your weekly summary and workout history.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+    🌙 Sleek Dark Mode UI: A consistent and modern dark theme applied across all screens for a great user experience.
 
-## Get a fresh project
+    🚀 Built with Expo Router: A fully featured, file-based navigation system for a clean and scalable app structure.
 
-When you're ready, run:
+🛠️ Technology Stack
 
-```bash
-npm run reset-project
-```
+    Framework: React Native with Expo
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+    Navigation: Expo Router
 
-## Learn more
+    Machine Learning: TensorFlow Lite via react-native-fast-tflite for on-device inference.
 
-To learn more about developing your project with Expo, look at the following resources:
+    Camera: react-native-vision-camera for high-performance, frame-by-frame video processing.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+    Local Storage: AsyncStorage for persisting user goals, workout history, and streaks.
 
-## Join the community
+    Styling: Themed stylesheets with a custom Theme Context for easy management of colors and styles.
 
-Join our community of developers creating universal apps.
+📸 Screenshots
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Home Screen
+	
+
+Exercise Detail
+	
+
+Exercise In Progress
+
+[Insert Screenshot of Home Screen]
+	
+
+[Insert Screenshot of Exercise Detail Screen]
+	
+
+[Insert Screenshot of Exercise Play Screen]
+
+Results Screen
+	
+
+Profile
+	
+
+Goal Setting
+
+[Insert Screenshot of Results Screen]
+	
+
+[Insert Screenshot of Profile Screen]
+	
+
+[Insert Screenshot of Add Goal Modal]
+🚀 Getting Started
+
+To get a local copy up and running, follow these simple steps.
+Prerequisites
+
+    Node.js (LTS version recommended)
+
+    Expo Go app on your iOS or Android device
+
+Installation
+
+    Clone the repo
+
+    git clone [https://github.com/your-username/vitality-ai.git](https://github.com/your-username/vitality-ai.git)
+
+    Install NPM packages
+
+    npm install
+
+    Run the app
+
+    npx expo start
+
