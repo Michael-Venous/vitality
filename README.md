@@ -50,7 +50,7 @@ Installation
 
     Clone the repo
 
-    git clone [https://github.com/your-username/vitality-ai.git](https://github.com/your-username/vitality-ai.git)
+    git clone [https://github.com/MrBCftw/vitality.git](https://github.com/MrBCftw/vitality.git)
 
     Install NPM packages
 
