@@ -37,39 +37,6 @@ Vitality AI bridges this gap by providing an accessible, AI-powered solution tha
 
     Styling: Themed stylesheets with a custom Theme Context for easy management of colors and styles.
 
-📸 Screenshots
-
-Home Screen
-	
-
-Exercise Detail
-	
-
-Exercise In Progress
-
-[Insert Screenshot of Home Screen]
-	
-
-[Insert Screenshot of Exercise Detail Screen]
-	
-
-[Insert Screenshot of Exercise Play Screen]
-
-Results Screen
-	
-
-Profile
-	
-
-Goal Setting
-
-[Insert Screenshot of Results Screen]
-	
-
-[Insert Screenshot of Profile Screen]
-	
-
-[Insert Screenshot of Add Goal Modal]
 🚀 Getting Started
 
 To get a local copy up and running, follow these simple steps.
