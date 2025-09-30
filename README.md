@@ -1,4 +1,6 @@
 Vitality AI - Your Virtual Personal Trainer
+![Timeline 3](https://github.com/user-attachments/assets/9bfcf37b-b986-4a45-ba9a-63e200249050)
+
 
 Build Your Vitality with AI Precision. Vitality AI is a mobile fitness application built with React Native that transforms your smartphone into an intelligent workout companion. It uses on-device machine learning to track your exercises, count your reps, and help you stay accountable to your fitness goals, all from the comfort of your home.
 The Problem
